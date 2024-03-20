@@ -8,7 +8,7 @@ from agent import PolyaAgent, UtilityPolyaAgent
 
 class PolyaProcess(Model):
 
-    MODEL_TYPES = ("linear", "nonlinear")
+    MODEL_TYPES = ("linear", "nonlinear", "preference", "technology")
 
     def __init__(self, model_type, max_steps, preference_match=None, benefits=None):
         """ Initialize models based on different model types.
@@ -80,14 +80,11 @@ class PolyaProcess(Model):
         
 
 class UtilityPolyaProcess(PolyaProcess):
-    UTILITY_MODELS = ("preference", "technology")
-    MODEL_TYPES = ("linear", "nonlinear", "preference-utility", "technology-utility")
-    def __init__(self, model_type, max_steps, utility_model_type, A, uc, seed, preference_match=None, benefits=None):
-        assert utility_model_type in UtilityPolyaProcess.UTILITY_MODELS
+    MODEL_TYPES = ( "preference", "technology")
+    def __init__(self, model_type, max_steps, A, uc, seed, preference_match=None, benefits=None):
         assert model_type in UtilityPolyaProcess.MODEL_TYPES
 
         super().__init__(model_type, max_steps, preference_match, benefits)
-        self.utility_type = utility_model_type
         self.num_zeros = 0
         self.num_ones = 0
         self.seed = seed
@@ -100,7 +97,7 @@ class UtilityPolyaProcess(PolyaProcess):
 
     # Override
     def step(self):
-        new_agent = UtilityPolyaAgent(self._next_agent_id, self, self.utility_type, self.A, self.uc)
+        new_agent = UtilityPolyaAgent(self._next_agent_id, self, self.model_type, self.A, self.uc)
         self.num_ones += new_agent.state
         self.num_zeros += (1-new_agent.state)
         self._next_agent_id +=1
