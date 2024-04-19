@@ -3,7 +3,7 @@ from mesa.agent import Agent
 import networkx as nx
 
 class Node(Agent):
-    def __init__(self, unique_id, model, load, capacity):
+    def __init__(self, unique_id, model: "CascadeNetwork", load, capacity):
         """Initialize an agent for cascade network model
 
         "load" == "fragility" and "capacity" == "threshold" and their interpretations
@@ -71,19 +71,19 @@ class Node(Agent):
         # Iterate through incoming neighbors
         for neighbor in self.inneighbors():
             # Check if neighbor has failed or is failing
-            if _____:
+            if neighbor.failed or neighbor.failing:
                 failed_neighbors += 1
 
         # Calculate the next load based on the number of failed neighbors and the node's indegree
-        self._next_load = _____ / self.indegree
+        self._next_load = failed_neighbors / self.indegree
 
     def outward(self):
         self._next_load = 0
         # Iterate through incoming neighbors
         for neighbor in self.inneighbors():
             # Increase load based on the state of each neighbor and their outdegree
-            if _____:
-                self._next_load += _____ / neighbor.outdegree
+            if neighbor.failed or neighbor.failing:
+                self._next_load += 1 / neighbor.outdegree
 
     # === END OF YOUR CODE ===
 
