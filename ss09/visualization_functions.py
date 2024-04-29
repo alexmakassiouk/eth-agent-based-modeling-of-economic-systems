@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import networkx as nx
 
 
-def plot_activity(activities, ax=None, height=0, alpha=0.05, size=100):
+def plot_activity(activities, ax=None, height=.0, alpha=0.05, size=100):
     """Plot an activity ribbon (e.g. when a link was created)"""
     if ax is None:
         ax = __provide_missing_ax()
@@ -46,11 +47,13 @@ def plot_network(world, ax=None):
     colors = [a.utility(a.subgraph()) for a in world.schedule.agents]
     nx.draw_networkx(net, nodelist=nodelist, node_color=colors, pos=pos, ax=ax)
 
-    norm = plt.matplotlib.colors.Normalize(vmin=min(colors), vmax=max(colors))
+    norm = mcolors.Normalize(vmin=min(colors), vmax=max(colors))
     scalar_map = plt.cm.ScalarMappable(norm=norm)
-    scalar_map._A = []
-    ax.figure.colorbar(scalar_map)
-    ax.axis("off")
+    # scalar_map._A = []
+    scalar_map.set_array([]) # Trying this and hoping it does the same as above line
+    # if ax.figure is not None:
+    #     ax.figure.colorbar(scalar_map)
+    #     ax.axis("off")
 
 
 def __provide_missing_ax():
