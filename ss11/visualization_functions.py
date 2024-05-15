@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 
-def plot_activity(activities, ax=None, height=0, alpha=0.05, size=100):
+def plot_activity(activities, ax=None, height=0., alpha=0.05, size=100):
     """Plot an activity ribbon (e.g. when a link was created)"""
     if ax is None:
         ax = __provide_missing_ax
