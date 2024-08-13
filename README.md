@@ -1,13 +1,17 @@
 # Agent-Based Modeling of Economic Systems
 
-> > _Alex Makassiouk_ <br> [ETH Zurich](https://ethz.ch/en.html), [D-MTEC](https://mtec.ethz.ch/), [Chair of Systems Design](https://www.sg.ethz.ch/) <br>
-> > 15.05.2024
+> _Alex Makassiouk_ (alexmak@stud.ntnu.no) <br> [ETH Zurich](https://ethz.ch/en.html), [D-MTEC](https://mtec.ethz.ch/), [Chair of Systems Design](https://www.sg.ethz.ch/) <br>
+> 13.08.2024
 
 ---
 
 This repository is dedicated to the exercises of the course Agent-Based Modeling of Economic Systems taught Spring 2024.
 
 The course itself was taught by Prof. Dr. Frank Schweitzer (fschweitzer@ethz.ch), full professor for Systems Design at ETH Zurich since 2004. The exercises were organized and taught by Dr. Luca Verginer (lverginer@ethz.ch) and Dr. Giona Casiraghi (gcasiraghi@ethz.ch), both senior researchers at the chair of Systems Design. I want to thank them all and the class for a very interesting course and interesting, engaging discussions.
+
+## About this repository
+
+This was primarily used for the coursework done during the semester, which is now moved into the folder 'solutions'. I realized that the material could be very useful for anyone wanting to learn more about ABM and so raw untouched exercises that can serve as a tutorial are now available in the 'exercises' folder. In addition, I will solve the exercises a second time, and these will be in the 'repetition' folder
 
 ## Course content
 
