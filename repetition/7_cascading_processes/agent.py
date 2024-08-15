@@ -2,6 +2,7 @@ import numpy as np
 from mesa.agent import Agent
 import networkx as nx
 
+
 class Node(Agent):
     def __init__(self, unique_id, model, load, capacity):
         """Initialize an agent for cascade network model
@@ -33,12 +34,11 @@ class Node(Agent):
 
     @property
     def indegree(self):
-        return self.model.network.in_degree(self.unique_id)
+        return self.model.network.in_degree(self.unique_id)  # type: ignore
 
     @property
     def outdegree(self):
-        return self.model.network.out_degree(self.unique_id)
-
+        return self.model.network.out_degree(self.unique_id)  # type: ignore
 
     def _nodes_to_ids(self, nodes):
         ids = set()
@@ -50,49 +50,50 @@ class Node(Agent):
     def _ids_to_nodes(self, ids):
         nodes = set()
         for id in ids:
-            node = self.model.schedule.agents[id]
+            node = self.model.schedule.agents[id]  # type: ignore
             nodes.add(node)
 
         return nodes
 
     def inneighbors(self, get_id=False):
-        ids = list(self.model.network.predecessors(self.unique_id))
+        ids = list(self.model.network.predecessors(  # type: ignore
+            self.unique_id))
         return ids if get_id else self._ids_to_nodes(ids)
-
 
     def outneighbors(self, get_id=False):
-        ids = list(self.model.network.successors(self.unique_id))
+        ids = list(self.model.network.successors(  # type: ignore
+            self.unique_id))
         return ids if get_id else self._ids_to_nodes(ids)
 
-
     # === YOUR CODE HERE ===
+
     def inward(self):
         failed_neighbors = 0
         # Iterate through incoming neighbors
         for neighbor in self.inneighbors():
             # Check if neighbor has failed or is failing
-            if _____:
+            if neighbor.failed or neighbor.failing:
                 failed_neighbors += 1
 
         # Calculate the next load based on the number of failed neighbors and the node's indegree
-        self._next_load = _____ / self.indegree
+        self._next_load = failed_neighbors / self.indegree
 
     def outward(self):
         self._next_load = 0
         # Iterate through incoming neighbors
         for neighbor in self.inneighbors():
             # Increase load based on the state of each neighbor and their outdegree
-            if _____:
-                self._next_load += _____ / neighbor.outdegree
+            if neighbor.failed or neighbor.failing:
+                self._next_load += 1 / neighbor.outdegree
 
     # === END OF YOUR CODE ===
 
-
     def reach_in(self, get_id=False):
         reach_in = set()
-        G = self.model.network
+        G = self.model.network  # type: ignore
         # one nodes are failed nodes at t + 1
-        one_nodes = self.model.failed_ids.union(self.model.failing_ids)
+        one_nodes = self.model.failed_ids.union(  # type: ignore
+            self.model.failing_ids)  # type: ignore
         in_neighbors = self.inneighbors(get_id=True)
 
         # Calculate reach_in_nodes
@@ -112,11 +113,12 @@ class Node(Agent):
 
     def reach_out(self, get_id=False):
         reach_out = set()
-        G = self.model.network
+        G = self.model.network  # type: ignore
         # one nodes are failed nodes at t + 1
-        one_nodes = self.model.failed_ids.union(self.model.failing_ids)
+        one_nodes = self.model.failed_ids.union(  # type: ignore
+            self.model.failing_ids)  # type: ignore
         # zero nodes are healthy nodes at t + 1
-        zero_nodes = self.model.healthy_ids
+        zero_nodes = self.model.healthy_ids  # type: ignore
         out_neighbors = self.outneighbors(get_id=True)
 
         # Calculate reach_out_nodes
@@ -136,7 +138,7 @@ class Node(Agent):
 
     def llsc(self):
         if self.failed or self.failing:
-            self._next_load = self.capacity if self.model.model_type == "overload" else 0
+            self._next_load = self.capacity if self.model.model_type == "overload" else 0  # type: ignore
         else:
             self._next_load = self._initial_load
             reach_in = self.reach_in()
@@ -144,7 +146,7 @@ class Node(Agent):
             # Calculate self._next_load
             for node in reach_in:
                 num_reach_out = len(node.reach_out(get_id=True))
-                if self.model.model_type == "load":
+                if self.model.model_type == "load":  # type: ignore
                     self._next_load += node._initial_load / num_reach_out
                 else:
                     self._next_load += (node._initial_load -
@@ -170,7 +172,7 @@ class Node(Agent):
 
     def llss(self):
         if self.failed or self.failing:
-            self._next_load = self.capacity if self.model.model_type == "overload" else 0
+            self._next_load = self.capacity if self.model.model_type == "overload" else 0  # type: ignore
         else:
             failed_in = self.failed_in()
 
@@ -180,7 +182,7 @@ class Node(Agent):
                 if len(node.healthy_out()) == 0:
                     continue
                 else:
-                    if self.model.model_type == "load":
+                    if self.model.model_type == "load":  # type: ignore
                         self._next_load += node.load / \
                             len(node.healthy_out())
                     else:
@@ -188,8 +190,8 @@ class Node(Agent):
                             len(node.healthy_out())
 
     def step(self):
-        model_type = self.model.model_type
-        load_type = self.model.load_type
+        model_type = self.model.model_type  # type: ignore
+        load_type = self.model.load_type  # type: ignore
 
         if model_type == "constant":
             if load_type == "in":
@@ -204,21 +206,21 @@ class Node(Agent):
                 self.llss()
 
     def advance(self):
-        if self.model.test:
+        if self.model.test:  # type: ignore
             self.test()
 
         # postprocess nodes that are failing at t
         if self.failing:
-            self.model.failing_ids.remove(self.unique_id)
+            self.model.failing_ids.remove(self.unique_id)  # type: ignore
             self.failed = True
-            self.model.failed_ids.add(self.unique_id)
+            self.model.failed_ids.add(self.unique_id)  # type: ignore
 
         self.load = self._next_load
 
         # preprocess nodes that are failing at t + 1
         if self.failing:
-            self.model.failing_ids.add(self.unique_id)
-            self.model.healthy_ids.remove(self.unique_id)
+            self.model.failing_ids.add(self.unique_id)  # type: ignore
+            self.model.healthy_ids.remove(self.unique_id)  # type: ignore
 
     def test(self):
         if self.failing:
