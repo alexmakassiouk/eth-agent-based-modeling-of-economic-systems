@@ -7,7 +7,8 @@ def plot_activity(activities, ax=None, height=.0, alpha=0.05, size=100):
     """Plot an activity ribbon (e.g. when a link was created)"""
     if ax is None:
         ax = __provide_missing_ax()
-    ax.scatter(activities, [height] * len(activities), marker="|", alpha=alpha, s=size)
+    ax.scatter(activities, [height] * len(activities),
+               marker="|", alpha=alpha, s=size)
 
 
 def plot_evolution(
@@ -28,7 +29,8 @@ def plot_evolution(
         ax.plot(poling_times, values, label=feature)
 
     if show_activities:
-        plot_activity(world.deletions.keys(), ax, height=-.02 * largest_value, alpha=.4)
+        plot_activity(world.deletions.keys(), ax,
+                      height=-.02 * largest_value, alpha=.4)
         plot_activity(
             world.insertions.keys(), ax, height=1.02 * largest_value, alpha=.4
         )
@@ -50,7 +52,8 @@ def plot_network(world, ax=None):
     norm = mcolors.Normalize(vmin=min(colors), vmax=max(colors))
     scalar_map = plt.cm.ScalarMappable(norm=norm)
     # scalar_map._A = []
-    scalar_map.set_array([]) # Trying this and hoping it does the same as above line
+    # Trying this and hoping it does the same as above line
+    scalar_map.set_array([])
     # if ax.figure is not None:
     #     ax.figure.colorbar(scalar_map)
     #     ax.axis("off")
