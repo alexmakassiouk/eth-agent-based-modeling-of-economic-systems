@@ -19,9 +19,10 @@ class Agent(mesa.Agent):
     An agent in the Koenig model, simulating decision making in a network.
     """
 
-    def __init__(self, model:"World", unique_id):
+    def __init__(self, model: "World", unique_id):
         super().__init__(unique_id, model)
-    
+        self.model = model
+
     # ==== Properties ====
     @property
     def uid(self):
@@ -81,7 +82,8 @@ class Agent(mesa.Agent):
         """
         if network is None:
             network = self.model.net
-        my_comp = [c for c in nx.connected_components(network) if self.uid in c][0]
+        my_comp = [c for c in nx.connected_components(
+            network) if self.uid in c][0]
         return my_comp
 
     def subgraph(self, network=None, copy=False):
@@ -256,7 +258,8 @@ class Agent(mesa.Agent):
         elif create is False:
             potential_subgraph = self.subgraph_if(remove_link_to=other)
         else:
-            raise ValueError(f"`create` must be either True or False, not {create}")
+            raise ValueError(
+                f"`create` must be either True or False, not {create}")
 
         actual_ev = self.leading_eigen_value(self.subgraph())
         potential_ev = self.leading_eigen_value(potential_subgraph)
@@ -289,7 +292,8 @@ class Agent(mesa.Agent):
         elif create is False:
             valid_set = list(self.neighbors())
         else:
-            raise ValueError(f"`create` must be either True or False, not {create}")
+            raise ValueError(
+                f"`create` must be either True or False, not {create}")
 
         if max_sample and max_sample < len(valid_set):
             chosen_uids = random.choices(valid_set, k=max_sample)
@@ -303,7 +307,8 @@ class Agent(mesa.Agent):
             if gain > 0:
                 gains_from_agent[other_agent.uid] = gain
 
-        gains_and_uids = [(gain, agent) for agent, gain in gains_from_agent.items()]
+        gains_and_uids = [(gain, agent)
+                          for agent, gain in gains_from_agent.items()]
         sorted_agents = sorted(gains_and_uids, reverse=True)
         return sorted_agents
 
@@ -340,10 +345,12 @@ class Agent(mesa.Agent):
 
         if not mutual:
             gain, chosen_uid = ranked_gains_uid[0]
-            return gain, self.model.schedule.agents[chosen_uid]  # returns the first one
+            # returns the first one
+            return gain, self.model.schedule.agents[chosen_uid]
 
         for gain_from_other, other_uid in ranked_gains_uid:
-            gain_other = self.model.schedule.agents[other_uid].gain_from_link(self, create)
+            gain_other = self.model.schedule.agents[other_uid].gain_from_link(
+                self, create)
             if gain_other >= 0:
                 return gain_from_other, self.model.schedule.agents[other_uid]
         return 0.0, None
@@ -476,16 +483,19 @@ class Agent(mesa.Agent):
             if (
                 own_degree < len(self.model) - 1
             ):  # is the agent already connected to everyone?
-                _, top_partner = self.best_simple_action(True, mutual, max_sample)
+                _, top_partner = self.best_simple_action(
+                    True, mutual, max_sample)
                 if top_partner:
                     self.create_link_to(top_partner)
         elif create is False:
             if self.degree() > 0:
-                _, top_partner = self.best_simple_action(False, mutual, max_sample)
+                _, top_partner = self.best_simple_action(
+                    False, mutual, max_sample)
                 if top_partner:
                     self.delete_link_to(top_partner)
         else:
-            raise ValueError(f"`create` must be either True or False, not {create}")
+            raise ValueError(
+                f"`create` must be either True or False, not {create}")
 
     def step(self):
         max_sample = self.model.max_sample
@@ -501,14 +511,15 @@ class Agent(mesa.Agent):
                 self.delete_bad_link(mutual=mutual_delete)
         elif update_type == "best_simple_choice":
             if create:
-                self.best_simple_action_update(create, mutual_create, max_sample)
+                self.best_simple_action_update(
+                    create, mutual_create, max_sample)
             else:
-                self.best_simple_action_update(create, mutual_delete, max_sample)
+                self.best_simple_action_update(
+                    create, mutual_delete, max_sample)
         elif update_type == "best_choice":
             self.best_action_update(mutual_create, mutual_delete, max_sample)
         else:
             raise KeyError(f'The update_type "{update_type}" is not valid.')
-
 
 
 class World(mesa.Model):
@@ -519,12 +530,12 @@ class World(mesa.Model):
     """
 
     def __init__(self, num_agents, cost, severance_cost,
-                 update_type, 
-                 deletion_prob, 
-                 mutual_create, 
+                 update_type,
+                 deletion_prob,
+                 mutual_create,
                  mutual_delete,
-                 poling_interval=1, 
-                 check_stability=1, 
+                 poling_interval=1,
+                 check_stability=1,
                  max_steps=None,
                  max_sample=None
                  ):
@@ -573,7 +584,7 @@ class World(mesa.Model):
             uid:
 
         """
-        uid = self._generate_uid() # generate a unique uid for the agent in the network
+        uid = self._generate_uid()  # generate a unique uid for the agent in the network
         if uid in self.net:
             raise KeyError(f"`uid={uid}` already taken")
 
@@ -586,7 +597,7 @@ class World(mesa.Model):
         self.schedule.remove(self.agent(agent_uid))
         self.net.remove_node(agent_uid)
 
-    def create_link(self, agent_1:Agent, agent_2:Agent):
+    def create_link(self, agent_1: Agent, agent_2: Agent):
         """Connect the two agents in the network"""
         self.net.add_edge(agent_1.uid, agent_2.uid)
 
@@ -624,11 +635,13 @@ class World(mesa.Model):
             float
         """
         if not norm:
-            welfare = sum(a.utility(a.subgraph()) for a in self.schedule.agents)
+            welfare = sum(a.utility(a.subgraph())
+                          for a in self.schedule.agents)
             return welfare
         else:
             num_agents = self.num_agents
-            welfare = sum(a.leading_eigen_value(a.subgraph()) for a in self.schedule.agents)
+            welfare = sum(a.leading_eigen_value(a.subgraph())
+                          for a in self.schedule.agents)
             welfare /= num_agents * (num_agents - 1)
         return welfare
 
@@ -711,19 +724,18 @@ class World(mesa.Model):
             valid_id_found = uid not in self.net
             self._id_counter += 1
         return uid
-    
+
     def step(self):
         # at given interval report on the state of the system
         if self.schedule.time % self.poling_interval == 0:
             self.datacollector.collect(self)
-            
+
         self.schedule.step()
         check_stability = self.check_stability
         update_type = self.update_type
         deletion_prob = self.deletion_prob
         mutual_create = self.mutual_create
         mutual_delete = self.mutual_delete
-    
 
         if check_stability and (self.schedule.time % check_stability == 0):
             # only creation cases
@@ -746,6 +758,7 @@ class World(mesa.Model):
         if self.max_steps and self.schedule.time >= self.max_steps:
             self.running = False
 
+
 def _adjacency_mat(net, dense=True):
     """extract the adjacency matrix from the given networkx Graph.
 
@@ -766,7 +779,7 @@ def _adjacency_mat(net, dense=True):
     s_row = row + col
     s_col = col + row
     adj_mat = coo_matrix(
-        (s_data, (s_row, s_col)), shape=(n_len, n_len), dtype=np.float
+        (s_data, (s_row, s_col)), shape=(n_len, n_len), dtype=float
     )
     if not dense:
         return adj_mat
